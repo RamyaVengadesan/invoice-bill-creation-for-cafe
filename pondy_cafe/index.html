@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pondy Café - Billing System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>Pondy Café</h1>
+            <p class="subtitle">Fresh Brews • Cozy Vibes • Pondicherry Style</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <button class="nav-btn active" data-view="billing">Billing</button>
+            <button class="nav-btn" data-view="admin">Products</button>
+            <button class="nav-btn" data-view="customers">Customers</button>
+            <button class="nav-btn" data-view="reports">Reports</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <!-- Billing View -->
+        <div id="billingView" class="view-content">
+            <div class="layout">
+                <!-- Left Side - Menu -->
+                <div class="menu-section">
+                    <div class="section-header">
+                        <h2>Menu</h2>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search items...">
+                    </div>
+
+                    <!-- Category Filters -->
+                    <div class="categories" id="categoryFilter">
+                        <button class="category-btn active" data-category="all">All Items</button>
+                        <button class="category-btn" data-category="Coffee">Coffee</button>
+                        <button class="category-btn" data-category="Tea">Tea</button>
+                        <button class="category-btn" data-category="Pastries">Pastries</button>
+                        <button class="category-btn" data-category="Beverages">Beverages</button>
+                        <button class="category-btn" data-category="Snacks">Snacks</button>
+                        <button class="category-btn" data-category="Sandwiches">Sandwiches</button>
+                        <button class="category-btn" data-category="Salads">Salads</button>
+                        <button class="category-btn" data-category="Breakfast">Breakfast</button>
+                    </div>
+
+                    <!-- Menu Items Grid -->
+                    <div class="menu-grid" id="menuGrid">
+                        <!-- Items will be loaded here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Right Side - Cart & Billing -->
+                <div class="cart-section">
+                    <div class="section-header">
+                        <h2>Cart</h2>
+                    </div>
+
+                    <!-- Cart Items -->
+                    <div class="cart-items" id="cartItems">
+                        <div class="empty-state">
+                            <p>Your cart is empty</p>
+                            <small>Add items from the menu</small>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (8%):</span>
+                            <span id="tax">₹0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="total">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Details -->
+                    <div class="customer-form">
+                        <h3>Customer Details</h3>
+                        <input type="text" id="customerName" placeholder="Customer Name *" required>
+                        <input type="tel" id="customerPhone" placeholder="Phone Number *" required>
+                        <input type="email" id="customerEmail" placeholder="Email (optional)">
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="payment-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <button class="payment-btn" data-method="Cash">Cash</button>
+                            <button class="payment-btn" data-method="Card">Card</button>
+                            <button class="payment-btn" data-method="UPI">UPI</button>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="clearBtn">Clear</button>
+                        <button class="btn btn-primary" id="checkoutBtn">Generate Invoice</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="adminView" class="view-content" style="display: none;">
+            <div id="adminContent">
+                <!-- Content loaded by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Customers View -->
+        <div id="customersView" class="view-content" style="display: none;">
+            <div id="customersContent">
+                <!-- Content loaded by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Reports View -->
+        <div id="reportsView" class="view-content" style="display: none;">
+            <div id="reportsContent">
+                <!-- Content loaded by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Invoice History</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="historySearch" class="search-input" placeholder="Search invoices...">
+                <div class="history-list" id="historyList">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal" id="addProductModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="close-btn" id="closeAddProduct">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm" onsubmit="saveNewProduct(event)">
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" name="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="productCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Coffee">Coffee</option>
+                            <option value="Tea">Tea</option>
+                            <option value="Pastries">Pastries</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Sandwiches">Sandwiches</option>
+                            <option value="Salads">Salads</option>
+                            <option value="Breakfast">Breakfast</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input type="number" name="productPrice" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Stock *</label>
+                        <input type="number" name="productStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum Stock Level *</label>
+                        <input type="number" name="productMinStock" min="0" value="10" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAddProduct()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal" id="editProductModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Edit Product</h2>
+                <button class="close-btn" id="closeEditProduct">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm" onsubmit="updateProduct(event)">
+                    <input type="hidden" name="productId" id="editProductId">
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" name="productName" id="editProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="productCategory" id="editProductCategory" required>
+                            <option value="Coffee">Coffee</option>
+                            <option value="Tea">Tea</option>
+                            <option value="Pastries">Pastries</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Sandwiches">Sandwiches</option>
+                            <option value="Salads">Salads</option>
+                            <option value="Breakfast">Breakfast</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹) *</label>
+                        <input type="number" name="productPrice" id="editProductPrice" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Quantity *</label>
+                        <input type="number" name="productStock" id="editProductStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum Stock Level *</label>
+                        <input type="number" name="productMinStock" id="editProductMinStock" min="0" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditProduct()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Pondy Café - Brewed with love</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
